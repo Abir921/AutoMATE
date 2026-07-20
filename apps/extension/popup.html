@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  /* Mirrors the web app's "Neon deck" tokens (apps/web/src/styles.css) - kept
+     as a static copy since the extension popup can't import the web app's
+     CSS or its remote Google Font (MV3 CSP). Dark is the base/default block,
+     matching the web app's default. Which one actually applies is decided by
+     popup.ts, which reads the web app's last-chosen theme (relayed via
+     themeBridge.ts + chrome.storage, since the popup and the web app are
+     different origins and can't share localStorage directly) and sets
+     [data-theme] to match - falling back to the OS preference below when the
+     web app is set to "system" or hasn't been opened yet. */
+  :root {
+    --bg: #040a06;
+    --surface: #0d130f;
+    --surface-2: #141b16;
+    --border: #1e2921;
+    --text-primary: #ffffff;
+    --text-secondary: #8fa094;
+    --accent: #ff46f6;
+    --accent-2: #d926ce;
+    --info: #10efec;
+    --danger: #ff5c5c;
+  }
+  :root[data-theme="light"] {
+    --bg: #f2f5f3;
+    --surface: #ffffff;
+    --surface-2: #f7faf8;
+    --border: #e2e8e4;
+    --text-primary: #040a06;
+    --text-secondary: #5f6b63;
+    --accent: #c81dbc;
+    --accent-2: #9c1493;
+    --info: #078a88;
+    --danger: #cf3535;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]):not([data-theme="light"]) {
+      --bg: #f2f5f3;
+      --surface: #ffffff;
+      --surface-2: #f7faf8;
+      --border: #e2e8e4;
+      --text-primary: #040a06;
+      --text-secondary: #5f6b63;
+      --accent: #c81dbc;
+      --accent-2: #9c1493;
+      --info: #078a88;
+      --danger: #cf3535;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    width: 280px; font-family: "Segoe UI", system-ui, sans-serif; padding: 18px;
+    background: var(--bg); color: var(--text-primary); margin: 0;
+  }
+  h1 {
+    font-size: 15px; font-weight: 800; margin: 0 0 14px; display: flex; align-items: center; gap: 8px;
+  }
+  h1::before {
+    content: ""; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(255, 70, 246, 0.22), 0 0 8px rgba(255, 70, 246, 0.55);
+  }
+  button {
+    width: 100%; padding: 11px; font-size: 14px; font-weight: 700; border: 1px solid transparent;
+    border-radius: 999px; cursor: pointer; color: white; transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  button:hover { transform: translateY(-1px); }
+  #start { background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 4px 16px rgba(255, 70, 246, 0.35); }
+  #stop { background: var(--danger); box-shadow: 0 4px 12px rgba(255, 92, 92, 0.3); }
+  #status { margin-top: 12px; font-size: 12px; color: var(--text-secondary); text-align: center; }
+  #error { margin-top: 10px; font-size: 12px; color: var(--danger); }
+  .footer {
+    margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); text-align: center;
+  }
+  .footer a {
+    color: var(--info); font-size: 12px; font-weight: 700; text-decoration: none;
+  }
+  .footer a:hover { text-decoration: underline; }
+  .session-section {
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .session-section label {
+    display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px;
+  }
+  .session-section input {
+    width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 13px; margin-bottom: 8px; box-sizing: border-box; font-family: inherit;
+    background: var(--surface-2); color: var(--text-primary);
+  }
+  .session-section input::placeholder { color: var(--text-secondary); }
+  .session-section input:focus {
+    outline: none; border-color: var(--info); box-shadow: 0 0 0 3px rgba(16, 239, 236, 0.18);
+  }
+  #capture-session { background: var(--surface-2); border-color: var(--border); box-shadow: none; }
+  #capture-session:hover { border-color: var(--info); }
+  #session-status { margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+  <h1>FormAutomator Recorder</h1>
+  <button id="start">Start Recording</button>
+  <button id="stop" style="display:none">Stop Recording</button>
+  <div id="status"></div>
+  <div id="error"></div>
+  <div class="session-section">
+    <label for="connect-token">Connect code (for login-required sites)</label>
+    <input id="connect-token" type="text" placeholder="Paste code from FormAutomator" />
+    <button id="capture-session">Capture session for this tab</button>
+    <div id="session-status"></div>
+  </div>
+  <div class="footer">
+    <a id="home-link" href="#" target="_blank" rel="noopener">Open FormAutomator &rarr;</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "formautomator",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/server",
+    "apps/web",
+    "apps/extension",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w apps/server",
+    "dev:web": "npm run dev -w apps/web",
+    "build:shared": "npm run build -w packages/shared"
+  }
+}

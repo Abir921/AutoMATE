@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ShowFinder - Flight Search</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">ShowFinder</span>
+    <a href="index.html">Shows</a>
+    <a href="hotel.html">Hotels</a>
+    <a href="flight.html" class="active">Flights</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Search flights</h1>
+    <p>Test fixture site &middot; another domain, same recorder</p>
+  </div>
+
+  <div class="panel-wrap">
+    <div class="panel">
+      <div class="field-row two-col">
+        <div class="field">
+          <label for="from">From</label>
+          <input id="from" type="text" placeholder="e.g. Dhaka (DAC)" />
+        </div>
+        <div class="field">
+          <label for="to">To</label>
+          <input id="to" type="text" placeholder="e.g. Cox's Bazar (CXB)" />
+        </div>
+      </div>
+      <div class="field-row two-col">
+        <div class="field">
+          <label for="departure">Departure date</label>
+          <input id="departure" type="date" />
+        </div>
+        <div class="field">
+          <label for="class">Class</label>
+          <select id="class">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+      </div>
+      <button id="go" class="primary-action">Search flights</button>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("go").addEventListener("click", () => {
+      const from = document.getElementById("from").value || "(any origin)";
+      const to = document.getElementById("to").value || "(any destination)";
+      const departure = document.getElementById("departure").value || "any date";
+      const cls = document.getElementById("class").value;
+      const results = document.getElementById("results");
+      results.textContent = "Searching flights...";
+      setTimeout(() => {
+        results.innerHTML = `
+          <div class="result-item"><strong>${from} &rarr; ${to}</strong> &middot; 07:20 AM <span>${departure}, ${cls}</span></div>
+          <div class="result-item"><strong>${from} &rarr; ${to}</strong> &middot; 01:45 PM <span>${departure}, ${cls}</span></div>
+          <div class="result-item"><strong>${from} &rarr; ${to}</strong> &middot; 08:10 PM <span>${departure}, ${cls}</span></div>
+        `;
+      }, 300);
+    });
+  </script>
+</body>
+</html>

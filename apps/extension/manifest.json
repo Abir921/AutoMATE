@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "FormAutomator Recorder",
+  "version": "0.1.0",
+  "description": "Record a task once on any website, then replay it as a REST API.",
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation", "cookies", "clipboardRead"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FormAutomator Recorder"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": ["http://localhost:5173/*"],
+      "js": ["themeBridge.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}

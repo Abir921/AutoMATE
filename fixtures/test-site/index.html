@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ShowFinder - Search Shows</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">ShowFinder</span>
+    <a href="index.html" class="active">Shows</a>
+    <a href="hotel.html">Hotels</a>
+    <a href="flight.html">Flights</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Find your next show</h1>
+    <p>Test fixture site &middot; used to demo the automation recorder</p>
+  </div>
+
+  <div class="panel-wrap">
+    <div class="panel">
+      <div class="field-row two-col">
+        <div class="field">
+          <label for="q">Show name</label>
+          <input id="q" type="text" placeholder="e.g. Hamilton" />
+        </div>
+        <div class="field">
+          <label for="city">City</label>
+          <select id="city">
+            <option value="dhaka">Dhaka</option>
+            <option value="chittagong">Chittagong</option>
+            <option value="sylhet">Sylhet</option>
+          </select>
+        </div>
+      </div>
+      <button id="go" class="primary-action">Search shows</button>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("go").addEventListener("click", () => {
+      const q = document.getElementById("q").value || "(nothing)";
+      const city = document.getElementById("city").value;
+      const results = document.getElementById("results");
+      results.textContent = "Searching...";
+      setTimeout(() => {
+        results.innerHTML = `
+          <div class="result-item"><strong>${q}</strong> &middot; Matinee 4:00 PM <span>${city}</span></div>
+          <div class="result-item"><strong>${q}</strong> &middot; Evening 7:00 PM <span>${city}</span></div>
+          <div class="result-item"><strong>${q}</strong> &middot; Late Night 10:00 PM <span>${city}</span></div>
+        `;
+      }, 300);
+    });
+  </script>
+</body>
+</html>

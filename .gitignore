@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.db
+*.db-*
+*.tsbuildinfo
+.secret-key
+.env
+.claude/settings.local.json

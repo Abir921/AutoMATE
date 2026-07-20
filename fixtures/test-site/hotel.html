@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ShowFinder - Hotel Booking</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  #cookie-banner {
+    position: fixed; left:0; right:0; bottom:0; background:#111827; color:white;
+    padding:14px 20px; display:flex; align-items:center; justify-content:center; gap:16px;
+    font-size:14px; z-index:1000;
+  }
+  #cookie-banner button {
+    background:#6366f1; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">ShowFinder</span>
+    <a href="index.html">Shows</a>
+    <a href="hotel.html" class="active">Hotels</a>
+    <a href="flight.html">Flights</a>
+  </nav>
+
+  <div id="cookie-banner">
+    <span>We use cookies to personalize your experience.</span>
+    <button>Accept cookies</button>
+  </div>
+
+  <div class="hero">
+    <h1>Check hotel availability</h1>
+    <p>Test fixture site &middot; demonstrates the recorder works beyond ticket search</p>
+  </div>
+
+  <div class="panel-wrap">
+    <div class="panel">
+      <div class="field-row">
+        <div class="field">
+          <label for="destination">Destination</label>
+          <input id="destination" type="text" placeholder="e.g. Cox's Bazar" />
+        </div>
+      </div>
+      <div class="field-row two-col">
+        <div class="field">
+          <label for="checkin">Check-in</label>
+          <input id="checkin" type="date" />
+        </div>
+        <div class="field">
+          <label for="checkout">Check-out</label>
+          <input id="checkout" type="date" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="guests">Guests</label>
+          <select id="guests">
+            <option value="1">1 guest</option>
+            <option value="2">2 guests</option>
+            <option value="3">3 guests</option>
+            <option value="4">4 guests</option>
+          </select>
+        </div>
+      </div>
+      <button id="go" class="primary-action">Check availability</button>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    // The cookie banner only shows unless ?skipBanner=1 is passed - lets us test
+    // that a recorded "dismiss banner" step is skipped gracefully on visits where
+    // it never appears, instead of the whole automation failing.
+    if (new URLSearchParams(location.search).get("skipBanner")) {
+      document.getElementById("cookie-banner").remove();
+    } else {
+      document.querySelector("#cookie-banner button").addEventListener("click", () => {
+        document.getElementById("cookie-banner").remove();
+      });
+    }
+
+    document.getElementById("go").addEventListener("click", () => {
+      const destination = document.getElementById("destination").value || "(anywhere)";
+      const checkin = document.getElementById("checkin").value || "any date";
+      const checkout = document.getElementById("checkout").value || "any date";
+      const guests = document.getElementById("guests").value;
+      const results = document.getElementById("results");
+      results.textContent = "Checking availability...";
+      setTimeout(() => {
+        results.innerHTML = `
+          <div class="result-item">
+            <strong id="result-1-name">Seaside Resort</strong> &middot;
+            <span id="result-1-price">$120/night</span>
+            <span id="result-1-dates">${checkin} to ${checkout}</span>
+            <span>${destination}, ${guests} guest(s)</span>
+          </div>
+          <div class="result-item"><strong>Palm Grove Hotel</strong> &middot; $95/night <span>${destination}</span></div>
+          <div class="result-item"><strong>Harbor View Inn</strong> &middot; $140/night <span>${destination}</span></div>
+        `;
+      }, 300);
+    });
+  </script>
+</body>
+</html>
