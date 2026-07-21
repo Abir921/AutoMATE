@@ -1,4 +1,4 @@
-import { ParameterCandidate, RecordedStep } from "@formautomator/shared";
+import { ParameterCandidate, RecordedStep } from "@automate/shared";
 import { PREFERENCE_URL_PARAMS } from "./stepValues";
 
 // Generic tracking/session param names seen across many sites - not worth

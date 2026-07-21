@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { Automation, AutomationDocs, RunResult } from "@formautomator/shared";
+import type { Automation, AutomationDocs, RunResult } from "@automate/shared";
 import { api } from "../api";
 import { validateParamValue } from "../validation";
 import RenameHeading from "../components/RenameHeading";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Automation, PricingMode } from "@formautomator/shared";
+import type { Automation, PricingMode } from "@automate/shared";
 import { api } from "../api";
 
 const PRICING_OPTIONS: { value: PricingMode; label: string; hint: string }[] = [

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { ParameterDef } from "@formautomator/shared";
+import type { ParameterDef } from "@automate/shared";
 import { api } from "../api";
 
 const SUGGEST_DEBOUNCE_MS = 600;

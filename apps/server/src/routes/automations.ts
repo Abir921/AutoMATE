@@ -2,7 +2,7 @@ import { Router } from "express";
 import { v4 as uuid } from "uuid";
 import { db, queryOne, queryAll, nowIso } from "../db";
 import { AuthedRequest, requireAuth } from "../auth";
-import { Automation, AutomationDocs, CapturedCookie, OutputField, ParameterDef, RecordedStep } from "@formautomator/shared";
+import { Automation, AutomationDocs, CapturedCookie, OutputField, ParameterDef, RecordedStep } from "@automate/shared";
 import { replayAutomation } from "../replayEngine";
 import { suggestLocations } from "../locationSuggest";
 import { checkAndConsumeCreationQuota } from "../planLimits";

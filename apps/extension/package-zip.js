@@ -4,7 +4,7 @@ const { execFileSync } = require("child_process");
 
 const distDir = path.join(__dirname, "dist");
 const outDir = path.join(__dirname, "..", "web", "public");
-const outFile = path.join(outDir, "formautomator-extension.zip");
+const outFile = path.join(outDir, "automate-extension.zip");
 
 fs.mkdirSync(outDir, { recursive: true });
 

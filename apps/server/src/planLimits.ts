@@ -1,5 +1,5 @@
 import { db, queryOne } from "./db";
-import { PlanInfo, SubscriptionPlan } from "@formautomator/shared";
+import { PlanInfo, SubscriptionPlan } from "@automate/shared";
 
 const DAILY_LIMITS: Record<SubscriptionPlan, number | null> = {
   free: 5,

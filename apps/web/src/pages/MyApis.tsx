@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import type { Automation, EmailAutomation } from "@formautomator/shared";
+import type { Automation, EmailAutomation } from "@automate/shared";
 import { api } from "../api";
 
 type ListItem =
@@ -109,7 +109,7 @@ export default function MyApis() {
 
       <div className="card">
         <p className="muted" style={{ margin: 0 }}>
-          To create a browser automation, install the FormAutomator browser extension, click the extension icon, hit{" "}
+          To create a browser automation, install the AutoMATE browser extension, click the extension icon, hit{" "}
           <strong>Start Recording</strong>, do the task on any website, then hit <strong>Stop Recording</strong>.
           You'll be brought back here to review it.
         </p>

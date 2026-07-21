@@ -81,7 +81,7 @@ authRouter.post("/forgot-password", async (req, res) => {
     try {
       await sendSystemEmail(
         email,
-        "Reset your FormAutomator password",
+        "Reset your AutoMATE password",
         `Someone requested a password reset for this account. This link expires in 30 minutes:\n\n${resetLink}\n\nIf this wasn't you, you can ignore this email.`
       );
     } catch (err) {

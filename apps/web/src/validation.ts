@@ -1,4 +1,4 @@
-import type { ParameterDef } from "@formautomator/shared";
+import type { ParameterDef } from "@automate/shared";
 
 // MIRROR NOTE: apps/server/src/paramValidation.ts implements these exact same
 // rules as the API's 400 backstop - keep the two in sync. (They can't share

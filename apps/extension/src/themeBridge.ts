@@ -1,11 +1,11 @@
-// Injected only into the FormAutomator web app itself (manifest.json scopes
+// Injected only into the AutoMATE web app itself (manifest.json scopes
 // this to WEB_BASE's origin, unlike content.ts's recorder which runs
 // everywhere). The popup can't read this page's localStorage directly - it's
 // a different origin (chrome-extension://<id> vs the web app's own) - so this
 // bridge relays the user's theme choice into chrome.storage, which both
 // contexts can access.
-const STORAGE_KEY = "formautomator_theme";
-const THEME_SYNC_EVENT = "formautomator-theme-change";
+const STORAGE_KEY = "automate_theme";
+const THEME_SYNC_EVENT = "automate-theme-change";
 
 type ThemeMode = "light" | "dark" | "system";
 

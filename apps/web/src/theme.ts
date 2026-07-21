@@ -1,17 +1,17 @@
 export type ThemeMode = "light" | "dark" | "system";
 
-const STORAGE_KEY = "formautomator_theme";
+const STORAGE_KEY = "automate_theme";
 const CYCLE: ThemeMode[] = ["system", "light", "dark"];
 
 /**
  * Dispatched on `window` whenever the user's theme choice changes, so the
- * FormAutomator browser extension - which can't read this page's
+ * AutoMATE browser extension - which can't read this page's
  * localStorage from its own popup (different origin) - can pick up live
  * changes via its content-script bridge (extension/src/themeBridge.ts).
  * That bridge also reads localStorage directly on injection, so the popup
  * stays correct even if it's opened before any toggle click fires this.
  */
-export const THEME_SYNC_EVENT = "formautomator-theme-change";
+export const THEME_SYNC_EVENT = "automate-theme-change";
 
 export function getThemeMode(): ThemeMode {
   const stored = localStorage.getItem(STORAGE_KEY);

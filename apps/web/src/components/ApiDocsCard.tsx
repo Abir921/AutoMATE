@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AutomationDocs } from "@formautomator/shared";
+import type { AutomationDocs } from "@automate/shared";
 import { getToken } from "../api";
 
 /** Collapsible REST API reference for one automation, including a ready-to-paste curl example. */

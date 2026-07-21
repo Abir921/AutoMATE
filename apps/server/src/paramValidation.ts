@@ -1,4 +1,4 @@
-import { ParameterDef } from "@formautomator/shared";
+import { ParameterDef } from "@automate/shared";
 
 // MIRROR NOTE: apps/web/src/validation.ts implements these exact same rules
 // for inline run-form errors - keep the two in sync. (They can't share one

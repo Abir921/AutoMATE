@@ -1,5 +1,5 @@
 import { Browser, chromium, Locator, Page } from "playwright";
-import { Automation, CapturedCookie, FailedStep, RecordedStep, ResultItem, RunResult } from "@formautomator/shared";
+import { Automation, CapturedCookie, FailedStep, RecordedStep, ResultItem, RunResult } from "@automate/shared";
 import { PREFERENCE_URL_PARAMS, withAppliedValue } from "./stepValues";
 
 const STEP_TIMEOUT_MS = 15_000;

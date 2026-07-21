@@ -36,7 +36,7 @@ function Topbar() {
   return (
     <header className="topbar">
       <Link to="/" className="brand">
-        FormAutomator
+        AutoMATE
       </Link>
       <div className="row">
         <NavLink to="/">Home</NavLink>

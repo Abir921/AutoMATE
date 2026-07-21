@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { v4 as uuid } from "uuid";
 import { db, queryOne, nowIso } from "../db";
-import { RecordedStep } from "@formautomator/shared";
+import { RecordedStep } from "@automate/shared";
 import { detectParameterCandidates } from "../paramDetect";
 
 export const draftsRouter = Router();

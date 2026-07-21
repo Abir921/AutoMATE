@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import type { MarketplaceListing } from "@formautomator/shared";
+import type { MarketplaceListing } from "@automate/shared";
 import { api } from "../api";
 
 const PRICING_LABELS: Record<string, string> = {

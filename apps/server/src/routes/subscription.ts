@@ -2,7 +2,7 @@ import { Router } from "express";
 import { v4 as uuid } from "uuid";
 import { db, nowIso } from "../db";
 import { AuthedRequest, requireAuth } from "../auth";
-import { SubscribeResult, SubscriptionPlan } from "@formautomator/shared";
+import { SubscribeResult, SubscriptionPlan } from "@automate/shared";
 import { getPlanInfo, PLAN_PRICES } from "../planLimits";
 
 export const subscriptionRouter = Router();

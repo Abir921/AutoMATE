@@ -2,7 +2,7 @@ import { Router } from "express";
 import { v4 as uuid } from "uuid";
 import { db, queryOne, queryAll, nowIso } from "../db";
 import { AuthedRequest, requireAuth } from "../auth";
-import { EmailAutomation, EmailRunResult } from "@formautomator/shared";
+import { EmailAutomation, EmailRunResult } from "@automate/shared";
 import { encrypt, decrypt } from "../crypto";
 import { checkAndConsumeCreationQuota } from "../planLimits";
 import { createGmailTransporter } from "../mailer";

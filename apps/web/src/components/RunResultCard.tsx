@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Automation, ResultItem, RunResult } from "@formautomator/shared";
+import type { Automation, ResultItem, RunResult } from "@automate/shared";
 
 const RESULTS_PAGE_SIZE = 10;
 

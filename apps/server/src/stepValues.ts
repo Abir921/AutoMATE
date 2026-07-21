@@ -1,4 +1,4 @@
-import { RecordedStep } from "@formautomator/shared";
+import { RecordedStep } from "@automate/shared";
 
 /**
  * "Sticky preference" query params: chosen once (usually on a site's home

@@ -14,11 +14,11 @@ export default function Home() {
         </div>
         <h1>Teach it once. It does the rest.</h1>
         <p className="lead">
-          FormAutomator watches you complete a task on any website one time, then turns it into a reusable automation
+          AutoMATE watches you complete a task on any website one time, then turns it into a reusable automation
           and a REST API - no coding required.
         </p>
         <div className="hero-actions">
-          <a href="/formautomator-extension.zip" download>
+          <a href="/automate-extension.zip" download>
             <button>Download Extension</button>
           </a>
           <Link to={loggedIn ? "/dashboard" : "/login"}>

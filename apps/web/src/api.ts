@@ -16,20 +16,20 @@ import type {
   SessionConnectTokenResult,
   SubscribeResult,
   SubscriptionPlan,
-} from "@formautomator/shared";
+} from "@automate/shared";
 
 const API_BASE = "http://localhost:4000/api";
 
 export function getToken(): string | null {
-  return localStorage.getItem("formautomator_token");
+  return localStorage.getItem("automate_token");
 }
 
 export function setToken(token: string): void {
-  localStorage.setItem("formautomator_token", token);
+  localStorage.setItem("automate_token", token);
 }
 
 export function clearToken(): void {
-  localStorage.removeItem("formautomator_token");
+  localStorage.removeItem("automate_token");
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {

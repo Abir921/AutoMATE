@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Automation } from "@formautomator/shared";
+import type { Automation } from "@automate/shared";
 import { api } from "../api";
 
 /**
@@ -123,7 +123,7 @@ export default function LoginSessionCard({
           </div>
           <ol className="muted" style={{ marginTop: 10, paddingLeft: 18 }}>
             <li>Make sure you're logged in on the tab that just opened (log in if it asks you to - already signed in is fine too).</li>
-            <li>Click the FormAutomator extension icon.</li>
+            <li>Click the AutoMATE extension icon.</li>
             <li>
               Click "Capture session for this tab"
               {codeCopied

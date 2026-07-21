@@ -1,4 +1,4 @@
-import type { Automation } from "@formautomator/shared";
+import type { Automation } from "@automate/shared";
 
 /**
  * Shown only for marketplace-purchased copies: how many uses / how much

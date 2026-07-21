@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "FormAutomator Recorder",
+  "name": "AutoMATE Recorder",
   "version": "0.1.0",
   "description": "Record a task once on any website, then replay it as a REST API.",
   "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation", "cookies", "clipboardRead"],
@@ -10,7 +10,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "FormAutomator Recorder"
+    "default_title": "AutoMATE Recorder"
   },
   "content_scripts": [
     {

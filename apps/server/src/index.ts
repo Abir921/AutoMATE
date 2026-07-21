@@ -35,5 +35,5 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 app.listen(PORT, () => {
-  console.log(`FormAutomator server listening on http://localhost:${PORT}`);
+  console.log(`AutoMATE server listening on http://localhost:${PORT}`);
 });

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { v4 as uuid } from "uuid";
 import { db, queryOne, queryAll, nowIso } from "../db";
 import { AuthedRequest, requireAuth } from "../auth";
-import { MarketplaceListing, PricingMode, PurchaseResult } from "@formautomator/shared";
+import { MarketplaceListing, PricingMode, PurchaseResult } from "@automate/shared";
 import { getPlanInfo } from "../planLimits";
 
 export const marketplaceRouter = Router();

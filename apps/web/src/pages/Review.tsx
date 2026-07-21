@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import type { OutputField, ParamType, ParameterCandidate, ParameterDef } from "@formautomator/shared";
+import type { OutputField, ParamType, ParameterCandidate, ParameterDef } from "@automate/shared";
 import { CURRENCY_OPTIONS } from "../currencies";
 import { validateParamValue } from "../validation";
 import { api } from "../api";

@@ -1,4 +1,4 @@
-import type { RecordedStep } from "@formautomator/shared";
+import type { RecordedStep } from "@automate/shared";
 import { API_BASE, WEB_BASE } from "./config";
 
 interface DraftOutputField {
@@ -94,13 +94,13 @@ async function stopRecording() {
     await chrome.tabs.create({ url: `${WEB_BASE}/review/${draftId}` });
     return { ok: true, draftId };
   } catch (err) {
-    // Most likely cause: the FormAutomator server isn't running. Without this
+    // Most likely cause: the AutoMATE server isn't running. Without this
     // catch, the error would propagate out of this handler and the popup's
     // sendMessage call would hang with no response - no tab opens, no error
     // shown, and it just looks like Stop Recording silently did nothing.
     return {
       ok: false,
-      error: `Couldn't reach the FormAutomator server at ${API_BASE}. Is it running? (${
+      error: `Couldn't reach the AutoMATE server at ${API_BASE}. Is it running? (${
         err instanceof Error ? err.message : String(err)
       })`,
     };

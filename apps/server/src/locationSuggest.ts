@@ -1,5 +1,5 @@
 import { chromium, Locator } from "playwright";
-import { Automation, ParameterDef } from "@formautomator/shared";
+import { Automation, ParameterDef } from "@automate/shared";
 
 const NAV_TIMEOUT_MS = 15_000;
 const FIELD_PROBE_TIMEOUT_MS = 4_000;

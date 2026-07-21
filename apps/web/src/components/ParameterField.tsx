@@ -1,4 +1,4 @@
-import type { ParameterDef } from "@formautomator/shared";
+import type { ParameterDef } from "@automate/shared";
 import { CURRENCY_OPTIONS } from "../currencies";
 import { displayLabel, humanizeTokenListValue } from "../paramDisplay";
 import LocationField from "./LocationField";

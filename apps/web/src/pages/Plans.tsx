@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { PlanInfo, SubscriptionPlan } from "@formautomator/shared";
+import type { PlanInfo, SubscriptionPlan } from "@automate/shared";
 import { api } from "../api";
 
 interface Tier {

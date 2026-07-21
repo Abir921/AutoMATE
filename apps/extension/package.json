@@ -1,5 +1,5 @@
 {
-  "name": "@formautomator/extension",
+  "name": "@automate/extension",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "package-zip": "node build.js && node package-zip.js"
   },
   "dependencies": {
-    "@formautomator/shared": "*"
+    "@automate/shared": "*"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.278",

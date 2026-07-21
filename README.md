@@ -1,8 +1,8 @@
-# FormAutomator
+# AutoMATE
 
 **Record a browser task once. Replay it forever as a REST API.**
 
-FormAutomator watches you complete a task in a normal Chrome tab — searching for hotels, posting an announcement, filling out a form — and turns what you did into a reusable, parameterized automation you can re-run with new values, call from your own code as a documented REST API, or list on a built-in marketplace for other people to buy.
+AutoMATE watches you complete a task in a normal Chrome tab — searching for hotels, posting an announcement, filling out a form — and turns what you did into a reusable, parameterized automation you can re-run with new values, call from your own code as a documented REST API, or list on a built-in marketplace for other people to buy.
 
 > Personal project, actively developed. Billing (subscriptions, marketplace purchases) is currently **simulated** — see [Project status & constraints](#project-status--constraints) below before assuming anything here moves real money.
 
@@ -19,7 +19,7 @@ flowchart LR
 ```
 
 1. **Record** — click the extension, do the task normally, stop recording.
-2. **Review** — FormAutomator guesses which fields you'll want to change next time (a destination, a date, a quantity) and lets you fine-tune them.
+2. **Review** — AutoMATE guesses which fields you'll want to change next time (a destination, a date, a quantity) and lets you fine-tune them.
 3. **Create** — it becomes a saved automation with an auto-documented REST API endpoint.
 4. **Run** — fill in a simple form (or call the API directly) and it replays the task in a real headless browser, returning structured results.
 5. **Sell** *(optional)* — list it on the marketplace so others can buy licensed, independent copies.
@@ -118,7 +118,7 @@ These are deliberate, current boundaries — not bugs:
 - **Replay always runs headless** — no visible browser window.
 - **The Chrome extension isn't on the Chrome Web Store** — it installs unpacked, in developer mode.
 
-For the full technical breakdown (module-by-module), see [`CLAUDE.md`](./CLAUDE.md). For the product-requirements view of what's built vs. planned, see [`PRD_FormAutomator.docx`](./PRD_FormAutomator.docx) (the original concept doc, [`PRD_FlowForge_7.pdf`](./PRD_FlowForge_7.pdf), is kept for history under the project's original working name).
+For the full technical breakdown (module-by-module), see [`CLAUDE.md`](./CLAUDE.md). For the product-requirements view of what's built vs. planned, see [`PRD_AutoMATE.docx`](./PRD_AutoMATE.docx) (the original concept doc, [`PRD_FlowForge_7.pdf`](./PRD_FlowForge_7.pdf), is kept for history under the project's original working name).
 
 ## License
 

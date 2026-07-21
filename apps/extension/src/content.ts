@@ -1,4 +1,4 @@
-import type { RecordedStep } from "@formautomator/shared";
+import type { RecordedStep } from "@automate/shared";
 import { buildSelectorCandidates } from "./selector";
 import { detectFieldLabel } from "./labels";
 
@@ -8,7 +8,7 @@ import { detectFieldLabel } from "./labels";
 // (needed so recording also works on tabs that were already open). Without
 // this guard, the second injection would register a second set of listeners
 // and every real user action would be recorded twice.
-const marker = "__formAutomatorRecorderLoaded";
+const marker = "__autoMateRecorderLoaded";
 if (!(window as any)[marker]) {
   (window as any)[marker] = true;
   init();
@@ -61,7 +61,7 @@ function init() {
   }
 
   function isOwnUi(el: Element | null): boolean {
-    return !!el && el.id === "__formautomator_toolbar_host";
+    return !!el && el.id === "__automate_toolbar_host";
   }
 
   document.addEventListener(
@@ -187,7 +187,7 @@ function init() {
 
 function createToolbar(handlers: { onStop: () => void }) {
   const host = document.createElement("div");
-  host.id = "__formautomator_toolbar_host";
+  host.id = "__automate_toolbar_host";
   host.style.cssText = "position:fixed; top:12px; right:12px; z-index:2147483647;";
   const shadow = host.attachShadow({ mode: "open" });
   shadow.innerHTML = `

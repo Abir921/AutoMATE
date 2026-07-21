@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { EmailAutomation, EmailRunResult } from "@formautomator/shared";
+import type { EmailAutomation, EmailRunResult } from "@automate/shared";
 import { api } from "../api";
 import { validateEmailAddress } from "../validation";
 import RenameHeading from "../components/RenameHeading";

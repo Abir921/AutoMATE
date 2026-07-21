@@ -1,7 +1,8 @@
-# FormAutomator
+# AutoMATE
 
-A SaaS platform (originally "FlowForge" per `PRD_FlowForge_7.pdf`, renamed early on) that lets a
-user record a browser workflow once via a Chrome extension and replay it as a reusable,
+A SaaS platform (originally "FlowForge" per `PRD_FlowForge_7.pdf`, then renamed to
+"FormAutomator", then to its current name "AutoMATE") that lets a user record a browser
+workflow once via a Chrome extension and replay it as a reusable,
 parameterized REST API. Includes a marketplace where users sell/buy runnable copies of each
 other's automations, and a subscription/quota system gating how many automations can be created
 per day.
