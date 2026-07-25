@@ -16,6 +16,7 @@ import type {
   SessionConnectTokenResult,
   SubscribeResult,
   SubscriptionPlan,
+  WalletInfo,
 } from "@automate/shared";
 
 // VITE_API_BASE lets a deployed build point at a separately-hosted server
@@ -108,7 +109,8 @@ export const api = {
 
   getMe: () =>
     request<
-      { email: string; name: string | null; createdAt: string; avatar: string | null; automationCount: number } & PlanInfo
+      { email: string; name: string | null; createdAt: string; avatar: string | null; automationCount: number; balance: number } &
+        PlanInfo
     >("/me"),
   updateAvatar: (avatar: string) =>
     request<{ avatar: string }>("/me/avatar", { method: "PUT", body: JSON.stringify({ avatar }) }),
@@ -149,4 +151,7 @@ export const api = {
   getSubscription: () => request<PlanInfo>("/subscription"),
   subscribe: (plan: SubscriptionPlan) =>
     request<SubscribeResult>("/subscription/purchase", { method: "POST", body: JSON.stringify({ plan }) }),
+
+  topUpWallet: (amount: number) =>
+    request<WalletInfo>("/wallet/topup", { method: "POST", body: JSON.stringify({ amount }) }),
 };

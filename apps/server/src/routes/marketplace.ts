@@ -129,6 +129,15 @@ marketplaceRouter.post("/listings/:id/purchase", (req: AuthedRequest, res) => {
   if (!source) return res.status(404).json({ error: "The listed automation no longer exists" });
 
   const price = listing.price;
+
+  const buyer = queryOne<{ balance: number }>("SELECT balance FROM users WHERE id = ?", req.userId as string);
+  const buyerBalance = buyer?.balance ?? 0;
+  if (buyerBalance < price) {
+    return res.status(402).json({
+      error: `Insufficient balance - this costs ${price} BDT and your wallet has ${buyerBalance} BDT. Top up your wallet first.`,
+    });
+  }
+
   const sellerPlan = getPlanInfo(listing.seller_id).plan;
   const platformFee = platformFeeFor(price, sellerPlan);
   const sellerPayout = price - platformFee;
@@ -165,6 +174,12 @@ marketplaceRouter.post("/listings/:id/purchase", (req: AuthedRequest, res) => {
       (id, listing_id, buyer_id, copied_automation_id, pricing_mode, price_paid, platform_fee, seller_payout, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(uuid(), listing.id, req.userId as string, automationId, licenseMode, price, platformFee, sellerPayout, nowIso());
+
+  // Mock money movement: buyer pays the full price, seller gets the payout
+  // (price minus platform fee). The fee itself isn't credited anywhere - there's
+  // no platform account - it's simply not paid out, same as a real marketplace's cut.
+  db.prepare("UPDATE users SET balance = balance - ? WHERE id = ?").run(price, req.userId as string);
+  db.prepare("UPDATE users SET balance = balance + ? WHERE id = ?").run(sellerPayout, listing.seller_id);
 
   const result: PurchaseResult = { automationId, pricePaid: price, platformFee, sellerPayout };
   res.status(201).json(result);

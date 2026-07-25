@@ -8,10 +8,13 @@ interface Profile {
   createdAt: string;
   avatar: string | null;
   automationCount: number;
+  balance: number;
   plan: string;
   dailyCreationLimit: number | null;
   creationsToday: number;
 }
+
+const MAX_TOPUP = 1_000_000;
 
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
@@ -25,6 +28,10 @@ export default function Dashboard() {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState("1000");
+  const [topUpBusy, setTopUpBusy] = useState(false);
+  const [topUpError, setTopUpError] = useState("");
 
   useEffect(() => {
     api.getMe().then(setProfile).catch((err) => setError(err.message));
@@ -70,6 +77,31 @@ export default function Dashboard() {
     setShowDeleteModal(false);
     setDeleteConfirmText("");
     setDeleteError("");
+  }
+
+  function closeTopUpModal() {
+    setShowTopUpModal(false);
+    setTopUpAmount("1000");
+    setTopUpError("");
+  }
+
+  async function topUp() {
+    const amount = Math.trunc(Number(topUpAmount));
+    if (!Number.isFinite(amount) || amount < 1 || amount > MAX_TOPUP) {
+      setTopUpError(`Enter a whole number between 1 and ${MAX_TOPUP.toLocaleString()} BDT.`);
+      return;
+    }
+    setTopUpError("");
+    setTopUpBusy(true);
+    try {
+      const { balance } = await api.topUpWallet(amount);
+      setProfile((prev) => (prev ? { ...prev, balance } : prev));
+      closeTopUpModal();
+    } catch (err) {
+      setTopUpError(err instanceof Error ? err.message : "Top up failed");
+    } finally {
+      setTopUpBusy(false);
+    }
   }
 
   async function deleteAccount() {
@@ -146,6 +178,15 @@ export default function Dashboard() {
               </Link>
             </div>
           </div>
+          <div className="stat-item">
+            <div className="stat-label">Wallet</div>
+            <div className="row" style={{ justifyContent: "space-between" }}>
+              <span className="stat-value">{profile.balance.toLocaleString()} BDT</span>
+              <button className="secondary btn-sm" onClick={() => setShowTopUpModal(true)}>
+                Top up
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -200,6 +241,49 @@ export default function Dashboard() {
               </button>
             </div>
             {deleteError && <div className="error" style={{ marginTop: 8 }}>{deleteError}</div>}
+          </div>
+        </div>
+      )}
+
+      {showTopUpModal && (
+        <div className="modal-overlay" onClick={closeTopUpModal}>
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="top-up-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="top-up-title" style={{ marginTop: 0 }}>
+              Top up your wallet
+            </h3>
+            <p className="muted">
+              No real money involved - this instantly adds mock BDT to your balance, which you can spend buying
+              automations on the Marketplace.
+            </p>
+            <div className="field">
+              <label>Amount (BDT)</label>
+              <input
+                autoFocus
+                type="number"
+                value={topUpAmount}
+                onChange={(e) => setTopUpAmount(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") closeTopUpModal();
+                }}
+                min={1}
+                max={MAX_TOPUP}
+              />
+            </div>
+            {topUpError && <div className="error">{topUpError}</div>}
+            <div className="row" style={{ gap: 8, marginTop: 16, justifyContent: "flex-end" }}>
+              <button className="secondary" disabled={topUpBusy} onClick={closeTopUpModal}>
+                Cancel
+              </button>
+              <button disabled={topUpBusy} onClick={topUp}>
+                {topUpBusy ? "Adding..." : "Add funds"}
+              </button>
+            </div>
           </div>
         </div>
       )}

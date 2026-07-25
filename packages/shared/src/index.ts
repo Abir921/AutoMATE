@@ -243,3 +243,13 @@ export interface ForgotPasswordResult {
    *  see systemMailer.ts. Never sent when a real reset email was dispatched. */
   devResetLink?: string;
 }
+
+/**
+ * Mock wallet balance (BDT) - topped up for free, no real payment ever
+ * involved. Spent buying marketplace listings; sellers get credited their
+ * payout on a sale. Same "instantly succeeds, updates DB state" pattern as
+ * subscription plan purchases.
+ */
+export interface WalletInfo {
+  balance: number;
+}

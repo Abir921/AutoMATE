@@ -10,10 +10,13 @@ meRouter.use(requireAuth);
 const MAX_AVATAR_LENGTH = 3_000_000; // ~2MB image as a base64 data URL
 
 meRouter.get("/", (req: AuthedRequest, res) => {
-  const user = queryOne<{ email: string; created_at: string; avatar: string | null; name: string | null }>(
-    "SELECT email, created_at, avatar, name FROM users WHERE id = ?",
-    req.userId as string
-  );
+  const user = queryOne<{
+    email: string;
+    created_at: string;
+    avatar: string | null;
+    name: string | null;
+    balance: number;
+  }>("SELECT email, created_at, avatar, name, balance FROM users WHERE id = ?", req.userId as string);
   if (!user) return res.status(404).json({ error: "Not found" });
 
   // Counts both browser and email automations - the Dashboard shows this as
@@ -34,6 +37,7 @@ meRouter.get("/", (req: AuthedRequest, res) => {
     createdAt: user.created_at,
     avatar: user.avatar,
     automationCount: count,
+    balance: user.balance,
     ...getPlanInfo(req.userId as string),
   });
 });

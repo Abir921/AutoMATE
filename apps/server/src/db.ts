@@ -154,3 +154,7 @@ addColumnIfMissing("users", "name TEXT");
 addColumnIfMissing("automations", "session_cookies_encrypted TEXT");
 addColumnIfMissing("automations", "session_captured_at TEXT");
 addColumnIfMissing("automations", "session_domain TEXT");
+// Mock wallet balance (BDT) - topped up for free (routes/wallet.ts), spent
+// buying marketplace listings and credited to sellers on a sale. No real
+// money ever changes hands, same as subscription plan "purchases".
+addColumnIfMissing("users", "balance INTEGER NOT NULL DEFAULT 0");

@@ -13,6 +13,7 @@ export default function Marketplace() {
   const navigate = useNavigate();
   const [listings, setListings] = useState<MarketplaceListing[] | null>(null);
   const [myEmail, setMyEmail] = useState("");
+  const [balance, setBalance] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -21,6 +22,7 @@ export default function Marketplace() {
       .then(([listings, me]) => {
         setListings(listings);
         setMyEmail(me.email);
+        setBalance(me.balance);
       })
       .catch((err) => setError(err.message));
   }, []);
@@ -33,6 +35,7 @@ export default function Marketplace() {
     setBusyId(listing.id);
     try {
       const result = await api.purchaseListing(listing.id);
+      setBalance((prev) => (prev !== null ? prev - result.pricePaid : prev));
       window.alert(
         `Purchased! You paid ${result.pricePaid} BDT (platform fee ${result.platformFee} BDT, seller received ${result.sellerPayout} BDT). It's now in your My APIs list.`
       );
@@ -59,9 +62,17 @@ export default function Marketplace() {
     <div>
       <div className="row" style={{ justifyContent: "space-between" }}>
         <h2>Marketplace</h2>
-        <Link to="/marketplace/new">
-          <button className="secondary">+ List one of my automations</button>
-        </Link>
+        <div className="row" style={{ gap: 12 }}>
+          {balance !== null && (
+            <span className="muted">
+              Wallet: <strong>{balance.toLocaleString()} BDT</strong>{" "}
+              <Link to="/dashboard">Top up</Link>
+            </span>
+          )}
+          <Link to="/marketplace/new">
+            <button className="secondary">+ List one of my automations</button>
+          </Link>
+        </div>
       </div>
 
       {error && <div className="error">{error}</div>}

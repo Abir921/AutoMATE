@@ -11,6 +11,7 @@ import { meRouter } from "./routes/me";
 import { emailAutomationsRouter } from "./routes/emailAutomations";
 import { marketplaceRouter } from "./routes/marketplace";
 import { subscriptionRouter } from "./routes/subscription";
+import { walletRouter } from "./routes/wallet";
 
 const app = express();
 app.use(cors());
@@ -24,6 +25,7 @@ app.use("/api/me", meRouter);
 app.use("/api/email-automations", emailAutomationsRouter);
 app.use("/api/marketplace", marketplaceRouter);
 app.use("/api/subscription", subscriptionRouter);
+app.use("/api/wallet", walletRouter);
 
 // Safety net: without this, an uncaught exception in a route handler falls
 // through to Express's default HTML error page, which the frontend can't
