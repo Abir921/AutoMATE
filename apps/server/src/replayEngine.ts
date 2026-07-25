@@ -1,6 +1,6 @@
 import { Browser, chromium, Locator, Page } from "playwright";
 import { Automation, CapturedCookie, FailedStep, RecordedStep, ResultItem, RunResult } from "@automate/shared";
-import { PREFERENCE_URL_PARAMS, withAppliedValue } from "./stepValues";
+import { PREFERENCE_URL_PARAMS, occurrenceOverrideKey, withAppliedValue } from "./stepValues";
 
 const STEP_TIMEOUT_MS = 15_000;
 const SELECTOR_PROBE_TIMEOUT_MS = 2_000;
@@ -47,7 +47,7 @@ export async function replayAutomation(
     const MAX_SESSION_ATTEMPTS = 3;
     let result: RunResult = { success: false, error: "Replay did not run", durationMs: 0 };
     for (let attempt = 1; attempt <= MAX_SESSION_ATTEMPTS; attempt++) {
-      const outcome = await replayInFreshContext(browser, automation, steps, sessionCookies ?? null, started);
+      const outcome = await replayInFreshContext(browser, automation, steps, values, sessionCookies ?? null, started);
       result = outcome.result;
       if (!(outcome.result.success && outcome.chromeOnly)) break;
     }
@@ -84,6 +84,7 @@ async function replayInFreshContext(
   browser: Browser,
   automation: Automation,
   steps: RecordedStep[],
+  values: Record<string, string>,
   sessionCookies: CapturedCookie[] | null,
   started: number
 ): Promise<{ result: RunResult; chromeOnly: boolean }> {
@@ -129,6 +130,7 @@ async function replayInFreshContext(
       hasRecordedNavigate = true;
       finalUrl = applyToggleFilters(steps, lastNavigateIndex, steps[lastNavigateIndex].url!);
       finalUrl = carryForwardPreferenceParams(steps, lastNavigateIndex, finalUrl);
+      finalUrl = reconcileRepeatedOccurrences(automation.parameters, values, finalUrl);
       await page.goto(finalUrl, { waitUntil: "domcontentloaded", timeout: STEP_TIMEOUT_MS });
       startIndex = lastNavigateIndex + 1;
     } else {
@@ -287,6 +289,55 @@ function carryForwardPreferenceParams(steps: RecordedStep[], lastNavigateIndex: 
   return url.toString();
 }
 
+/**
+ * Grows or shrinks a repeated URL param's occurrence count to match its
+ * "controller" param's CURRENT value (booking.com: as many "age=" as
+ * "group_children" says), keyed off ParameterDef.controlsOccurrenceCountOf
+ * (paramDetect.ts pairs these up at recording time). Only the occurrences
+ * that existed when recorded ever had their own editable run-form field
+ * (age, age_2) - but the run form now renders a REAL field for slots beyond
+ * that too, growing/shrinking live as the count changes, and sends each new
+ * slot's value under occurrenceOverrideKey(repeatedKey, index) since there's
+ * no ParameterDef to carry it. That explicit value always wins here; only a
+ * caller that skipped the run form entirely (a direct API call with just the
+ * count changed) falls back to repeating the last known occurrence's value,
+ * which beats leaving the slot unset (new children silently defaulting to
+ * age 0).
+ */
+function reconcileRepeatedOccurrences(
+  parameters: Automation["parameters"],
+  values: Record<string, string>,
+  finalUrl: string
+): string {
+  let url: URL;
+  try {
+    url = new URL(finalUrl);
+  } catch {
+    return finalUrl;
+  }
+
+  for (const controller of parameters) {
+    const repeatedKey = controller.controlsOccurrenceCountOf;
+    if (!repeatedKey) continue;
+
+    const desiredCount = Number(values[controller.key] ?? controller.defaultValue);
+    if (!Number.isFinite(desiredCount) || desiredCount < 0) continue;
+
+    const current = url.searchParams.getAll(repeatedKey);
+    const next: string[] = [];
+    for (let i = 0; i < desiredCount; i++) {
+      const override = values[occurrenceOverrideKey(repeatedKey, i)];
+      next.push(override !== undefined ? override : current[i] ?? current[current.length - 1] ?? "");
+    }
+    if (next.length === current.length && next.every((v, i) => v === current[i])) continue;
+
+    url.searchParams.delete(repeatedKey);
+    for (const v of next) url.searchParams.append(repeatedKey, v);
+  }
+
+  return url.toString();
+}
+
 // A ;-joined list of key=value filter tokens (how nflt-style params look).
 const TOKEN_LIST_RE = /^[^;&=]+=[^;&=]+(;[^;&=]+=[^;&=]+)*$/;
 
@@ -333,7 +384,7 @@ function substituteValues(
     const newValue = values[param.key];
     const step = result[param.stepIndex];
     if (newValue === undefined || !step) continue;
-    result[param.stepIndex] = withAppliedValue(step, newValue, param.urlParam);
+    result[param.stepIndex] = withAppliedValue(step, newValue, param.urlParam, param.urlParamOccurrence);
   }
   return result;
 }

@@ -129,6 +129,7 @@ interface StepOverride {
   stepIndex: number;
   value: string;
   urlParam?: string;
+  urlParamOccurrence?: number;
 }
 
 // Fields the user chose NOT to make changeable can still have their baked-in
@@ -138,7 +139,7 @@ function applyStepOverrides(steps: RecordedStep[], overrides: unknown): Recorded
   for (const override of overrides as StepOverride[]) {
     const step = steps[override.stepIndex];
     if (!step || typeof override.value !== "string") continue;
-    steps[override.stepIndex] = withAppliedValue(step, override.value, override.urlParam);
+    steps[override.stepIndex] = withAppliedValue(step, override.value, override.urlParam, override.urlParamOccurrence);
   }
   return steps;
 }

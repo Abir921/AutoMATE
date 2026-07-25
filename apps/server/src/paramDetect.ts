@@ -79,6 +79,15 @@ export function detectParameterCandidates(steps: RecordedStep[]): ParameterCandi
     // in steps_json - never surface it as an editable "sample value".
     if (step.type === "input" && step.inputType === "password") return;
     if ((step.type === "input" || step.type === "change") && step.selectors?.length && step.value) {
+      // Replay jumps straight to the LAST navigate step and never executes
+      // anything at or before it (replayEngine.ts: startIndex = lastNavigateIndex
+      // + 1) - a field bound to an earlier step is unreachable, so editing it
+      // on the run form would silently do nothing. Only surface it if either
+      // there's no navigate step at all (a pure single-page app, where every
+      // step always runs) or it happens to fall after the jump target.
+      const isDeadAtReplay = lastNavigateIndex >= 0 && stepIndex <= lastNavigateIndex;
+      if (isDeadAtReplay) return;
+
       const suggestedLabel = suggestLabel(step);
       candidates.push({
         selector: step.selectors[0],
@@ -96,29 +105,72 @@ export function detectParameterCandidates(steps: RecordedStep[]): ParameterCandi
       } catch {
         return;
       }
-      // Some sites (booking.com) repeat the same query key twice in one URL -
-      // without this, forEach visits it twice and produces two identical
-      // candidate rows for one field.
+      // getAll() (not a plain forEach, which visits every occurrence) so a
+      // key repeated for each unit of something (booking.com: one "age=" per
+      // child) can be inspected as a whole - keeps a single-occurrence key
+      // exactly as before, but a repeated one becomes one candidate PER
+      // occurrence below instead of silently collapsing to just the first.
       const seenKeys = new Set<string>();
-      url.searchParams.forEach((value, key) => {
+      for (const key of url.searchParams.keys()) {
         const lower = key.toLowerCase();
-        if (seenKeys.has(lower)) return;
+        if (seenKeys.has(lower)) continue;
         seenKeys.add(lower);
-        if (!value || NOISE_PARAMS.has(lower) || lower.startsWith("utm_")) return;
-        if (INTERNAL_SUFFIXES.some((suffix) => lower.endsWith(suffix))) return;
-        if (value.split(";").some((token) => toggleTokens.has(token))) return;
-        const suggestedLabel = FRIENDLY_PARAM_LABELS[lower] ?? humanize(key);
-        candidates.push({
-          selector: `navigate[${stepIndex}] ?${key}`,
-          stepIndex,
-          sampleValue: value,
-          inputType: isLocationField(suggestedLabel, key) ? "location" : inferInputType(value),
-          suggestedLabel,
-          urlParam: key,
+
+        const occurrences = url.searchParams.getAll(key);
+        if (!occurrences[0] || NOISE_PARAMS.has(lower) || lower.startsWith("utm_")) continue;
+        if (INTERNAL_SUFFIXES.some((suffix) => lower.endsWith(suffix))) continue;
+        // If ANY occurrence's value is a filter-checkbox token, the whole key
+        // is the nflt-style aggregate those checkboxes control - never surface
+        // it, occurrence count aside.
+        if (occurrences.some((value) => value.split(";").some((token) => toggleTokens.has(token)))) continue;
+
+        const baseLabel = FRIENDLY_PARAM_LABELS[lower] ?? humanize(key);
+        occurrences.forEach((value, occurrenceIndex) => {
+          if (!value) return;
+          const multiple = occurrences.length > 1;
+          candidates.push({
+            selector: `navigate[${stepIndex}] ?${key}${multiple ? `[${occurrenceIndex}]` : ""}`,
+            stepIndex,
+            sampleValue: value,
+            inputType: isLocationField(baseLabel, key) ? "location" : inferInputType(value),
+            suggestedLabel: multiple ? `${baseLabel} ${occurrenceIndex + 1}` : baseLabel,
+            urlParam: key,
+            urlParamOccurrence: multiple ? occurrenceIndex : undefined,
+          });
         });
-      });
+      }
     }
   });
+
+  // A repeated key's occurrence count sometimes exactly matches another
+  // recorded number field (booking.com: group_children's "2" <-> two "age="
+  // occurrences) - link them so replay can grow/shrink the occurrence count
+  // when that number changes, instead of leaving new slots at the site's own
+  // default (e.g. a newly-added child silently getting age 0). First
+  // candidate whose sample value matches wins; a coincidental false match
+  // would need an unrelated field's exact recorded value to equal another
+  // key's exact recorded repeat count, which is rare enough not to guard against.
+  const occurrenceCounts = new Map<string, number>();
+  for (const c of candidates) {
+    if (c.urlParam && c.urlParamOccurrence !== undefined) {
+      occurrenceCounts.set(c.urlParam, (occurrenceCounts.get(c.urlParam) ?? 0) + 1);
+    }
+  }
+  if (occurrenceCounts.size > 0) {
+    const claimedKeys = new Set<string>(); // one controller per repeated key
+    for (const candidate of candidates) {
+      if (candidate.urlParamOccurrence !== undefined) continue; // a repeated key can't control itself
+      if (!/^\d+$/.test(candidate.sampleValue)) continue;
+      const count = Number(candidate.sampleValue);
+      for (const [repeatedKey, occurrenceCount] of occurrenceCounts) {
+        if (occurrenceCount === count && repeatedKey !== candidate.urlParam && !claimedKeys.has(repeatedKey)) {
+          candidate.controlsOccurrenceCountOf = repeatedKey;
+          claimedKeys.add(repeatedKey);
+          break;
+        }
+      }
+    }
+  }
 
   // Sticky preference params (currency picker etc.) usually appear only on an
   // EARLY navigate URL - the site remembers them in a cookie afterwards, so

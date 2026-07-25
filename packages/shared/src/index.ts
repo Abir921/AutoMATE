@@ -48,6 +48,21 @@ export interface ParameterDef {
    * since that state almost always ends up in the URL after the search runs.
    */
   urlParam?: string;
+  /**
+   * 0-based position when urlParam appears more than once in the URL (e.g.
+   * booking.com's one "age=" per child: age=14&age=15). Omitted for a
+   * single-occurrence param. Lets replay edit the right occurrence instead of
+   * always overwriting the first.
+   */
+  urlParamOccurrence?: number;
+  /**
+   * Set on a number-type param whose recorded value equals how many times
+   * some OTHER param's urlParam repeated in the same URL (children's "2"
+   * matching two "age=" occurrences) - names that repeated param's key, so
+   * replay can grow/shrink the occurrence count when this value changes
+   * instead of leaving new slots at the site's own default.
+   */
+  controlsOccurrenceCountOf?: string;
 }
 
 export interface ParameterCandidate {
@@ -58,6 +73,10 @@ export interface ParameterCandidate {
   suggestedLabel: string;
   /** Set when this candidate came from a URL query parameter rather than a form field. */
   urlParam?: string;
+  /** See ParameterDef.urlParamOccurrence. */
+  urlParamOccurrence?: number;
+  /** See ParameterDef.controlsOccurrenceCountOf. */
+  controlsOccurrenceCountOf?: string;
 }
 
 /** A single named piece of information to extract from the page after replay. */

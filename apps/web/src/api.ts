@@ -82,7 +82,7 @@ export const api = {
     parameters: ParameterDef[];
     outputEnabled: boolean;
     outputFields?: OutputField[];
-    stepOverrides?: { stepIndex: number; value: string; urlParam?: string }[];
+    stepOverrides?: { stepIndex: number; value: string; urlParam?: string; urlParamOccurrence?: number }[];
   }) => request<{ id: string }>("/automations", { method: "POST", body: JSON.stringify(input) }),
 
   listAutomations: () => request<Automation[]>("/automations"),

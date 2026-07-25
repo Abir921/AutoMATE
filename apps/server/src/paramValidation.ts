@@ -1,4 +1,5 @@
 import { ParameterDef } from "@automate/shared";
+import { occurrenceOverrideKey } from "./stepValues";
 
 // MIRROR NOTE: apps/web/src/validation.ts implements these exact same rules
 // for inline run-form errors - keep the two in sync. (They can't share one
@@ -28,8 +29,16 @@ function isPastDate(value: string): boolean {
   return new Date(y, m - 1, d) < today;
 }
 
-/** One parameter's problem in plain words, or null if the value is fine. */
-export function validateParamValue(param: ParameterDef, rawValue: string | undefined): string | null {
+/**
+ * One parameter's problem in plain words, or null if the value is fine.
+ * Accepts anything label+type shaped so a synthesized "extra occurrence slot"
+ * field (one with no ParameterDef of its own - see validateRunValues below)
+ * can be validated the same way as a real one.
+ */
+export function validateParamValue(
+  param: Pick<ParameterDef, "label" | "type">,
+  rawValue: string | undefined
+): string | null {
   const value = (rawValue ?? "").trim();
   if (!value) return `${param.label} is required.`;
 
@@ -62,6 +71,28 @@ export function validateRunValues(parameters: ParameterDef[], values: Record<str
     const problem = validateParamValue(param, values[param.key]);
     if (problem) problems.push(problem);
   }
+
+  // Occurrence slots beyond what was recorded (e.g. a 3rd child's age when
+  // only 2 were ever recorded) have no ParameterDef of their own - the run
+  // form sends them under occurrenceOverrideKey(urlParam, index) (see
+  // stepValues.ts). Validate each one a direct API caller could plausibly
+  // have sent, using a recorded occurrence's label/type as the stand-in.
+  for (const controller of parameters) {
+    const repeatedKey = controller.controlsOccurrenceCountOf;
+    if (!repeatedKey) continue;
+    const recordedOccurrences = parameters.filter((p) => p.urlParam === repeatedKey && p.urlParamOccurrence !== undefined);
+    const sample = recordedOccurrences[0];
+    if (!sample) continue;
+    const desiredCount = Number(values[controller.key] ?? controller.defaultValue);
+    if (!Number.isFinite(desiredCount)) continue;
+    const labelRoot = sample.label.replace(/\s+\d+$/, "");
+    for (let i = recordedOccurrences.length; i < desiredCount; i++) {
+      const key = occurrenceOverrideKey(repeatedKey, i);
+      const problem = validateParamValue({ label: `${labelRoot} ${i + 1}`, type: sample.type }, values[key]);
+      if (problem) problems.push(problem);
+    }
+  }
+
   return problems.length > 0 ? problems.join(" ") : null;
 }
 

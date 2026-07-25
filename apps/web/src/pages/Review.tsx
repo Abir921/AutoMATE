@@ -29,6 +29,30 @@ function slugify(label: string): string {
   );
 }
 
+/**
+ * Guarantees every param's key is unique within the list, in place order.
+ * Two independently-detected candidates can slugify to the same key (e.g. a
+ * native checkbox labeled "Travelling with pets?" and an unrelated URL param
+ * "travelling_with_pets" both slugify to "travelling_with_pets") - without
+ * this, both fields silently read/write the same run-form value and the same
+ * validation error, and only one of the two ever actually gets submitted to
+ * the API under that key. Called after every edit that could touch a key, so
+ * the invariant holds regardless of which field changed.
+ */
+function dedupeKeys(list: EditableParam[]): EditableParam[] {
+  const seen = new Set<string>();
+  return list.map((p) => {
+    let key = p.key;
+    let suffix = 2;
+    while (seen.has(key)) {
+      key = `${p.key}_${suffix}`;
+      suffix++;
+    }
+    seen.add(key);
+    return key === p.key ? p : { ...p, key };
+  });
+}
+
 /** Maps the recorded HTML input type onto the run-form control we'll render for it. */
 function toParamType(inputType: string | undefined): ParamType {
   switch (inputType) {
@@ -71,14 +95,16 @@ export default function Review() {
         setStartUrl(draft.startUrl);
         setStepCount(draft.steps.length);
         setParams(
-          draft.candidates.map((c) => ({
-            candidate: c,
-            include: true,
-            key: slugify(c.suggestedLabel),
-            label: c.suggestedLabel,
-            type: toParamType(c.inputType),
-            value: c.sampleValue,
-          }))
+          dedupeKeys(
+            draft.candidates.map((c) => ({
+              candidate: c,
+              include: true,
+              key: slugify(c.suggestedLabel),
+              label: c.suggestedLabel,
+              type: toParamType(c.inputType),
+              value: c.sampleValue,
+            }))
+          )
         );
         if (draft.outputFields.length > 0) {
           setOutputEnabled(true);
@@ -90,7 +116,12 @@ export default function Review() {
   }, [draftId]);
 
   function updateParam(index: number, patch: Partial<EditableParam>) {
-    setParams((prev) => prev.map((p, i) => (i === index ? { ...p, ...patch } : p)));
+    setParams((prev) => {
+      const next = prev.map((p, i) => (i === index ? { ...p, ...patch } : p));
+      // Re-run whenever a key could have changed (a label edit re-derives its
+      // key) so two fields never end up sharing one - see dedupeKeys().
+      return "key" in patch || "label" in patch ? dedupeKeys(next) : next;
+    });
     // Editing a row clears its error - it re-validates on Create.
     setParamErrors((prev) => {
       if (!(index in prev)) return prev;
@@ -138,6 +169,8 @@ export default function Review() {
           defaultValue: p.value,
           type: p.type,
           urlParam: p.candidate.urlParam,
+          urlParamOccurrence: p.candidate.urlParamOccurrence,
+          controlsOccurrenceCountOf: p.candidate.controlsOccurrenceCountOf,
         }));
 
       const fields: OutputField[] = outputFields
@@ -148,7 +181,12 @@ export default function Review() {
       // bake the new value into the recorded step itself.
       const stepOverrides = params
         .filter((p) => !p.include && p.value !== p.candidate.sampleValue)
-        .map((p) => ({ stepIndex: p.candidate.stepIndex, value: p.value, urlParam: p.candidate.urlParam }));
+        .map((p) => ({
+          stepIndex: p.candidate.stepIndex,
+          value: p.value,
+          urlParam: p.candidate.urlParam,
+          urlParamOccurrence: p.candidate.urlParamOccurrence,
+        }));
 
       const { id } = await api.createAutomation({
         draftId,
