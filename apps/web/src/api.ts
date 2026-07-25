@@ -18,7 +18,11 @@ import type {
   SubscriptionPlan,
 } from "@automate/shared";
 
-const API_BASE = "http://localhost:4000/api";
+// VITE_API_BASE lets a deployed build point at a separately-hosted server
+// (Vercel serves this frontend as static files; the server - Playwright +
+// SQLite - needs an always-on host like Render/Railway, not Vercel's
+// serverless functions). Falls back to localhost for local dev.
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000/api";
 
 export function getToken(): string | null {
   return localStorage.getItem("automate_token");
