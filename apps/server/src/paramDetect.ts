@@ -6,6 +6,17 @@ import { PREFERENCE_URL_PARAMS } from "./stepValues";
 // are conventional analytics/session keys used web-wide.
 const NOISE_PARAMS = new Set([
   "sid", "aid", "label", "lang", "sb", "src", "src_elem", "ref", "session", "token", "gclid", "fbclid", "efdco",
+  // "route" is the internal MVC controller/action target used by OpenCart and
+  // similar CMS-driven sites (route=product/search) - fixed by which page you
+  // recorded, not something a user would ever want to "change" independently
+  // of the rest of the search.
+  "route",
+  // OpenCart's search-scope toggle (description=true/false: also match inside
+  // product descriptions, not just names) - unlike a real recorded checkbox
+  // (e.g. booking.com's travelling-with-pets toggle), this is a bare URL flag
+  // with no UI control behind it at all, so there's nothing for the user to
+  // meaningfully "change" - it's always whatever it was during recording.
+  "description",
 ]);
 
 // Internal identifiers that ride alongside a human-readable field (e.g. ss=

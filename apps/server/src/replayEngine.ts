@@ -677,6 +677,29 @@ function scrapeListings(maxItems: number): ResultItem[] {
   const CURRENCY_RE =
     /(?:[$£€¥₹₪₩₺₫฿₦₴]|BDT|USD|EUR|GBP|INR|ILS|ARS|MYR|SGD|AUD|CAD|NZD|CHF|JPY|CNY|KRW|THB|IDR|PHP|VND|TRY|PLN|SEK|NOK|DKK|AED|SAR|HKD|Tk|RM|Rp|zł|kr|Rs\.?)\s?\d[\d,.]*(?:\.\d+)?/i;
   const NOISE_LINE_RE = /^(show more|read more|see availability|book now|reserve|save|share|see photos?|view deal|sold out)$/i;
+  const BARE_NUMBER_RE = /\d[\d,.]*(?:\.\d+)?/;
+
+  /**
+   * A card's price text, or undefined if none is found. Tries a currency
+   * symbol/code first; some storefronts (seen on a Bangladeshi retailer)
+   * render the currency mark as an icon/pseudo-element rather than real text,
+   * leaving just a bare number in the DOM - for those, falls back to the
+   * most specific descendant whose class name says "price" (an extremely
+   * common convention: OpenCart, WooCommerce, and Shopify themes all use it),
+   * taking its own text only if it's actually a number.
+   */
+  function findPriceText(el: Element): string | undefined {
+    const direct = visibleText(el).match(CURRENCY_RE);
+    if (direct) return direct[0];
+
+    const priceCandidates = Array.from(el.querySelectorAll('[class*="price" i]'));
+    priceCandidates.sort((a, b) => a.querySelectorAll("*").length - b.querySelectorAll("*").length);
+    for (const candidate of priceCandidates) {
+      const text = visibleText(candidate).trim();
+      if (text.length > 0 && text.length < 40 && BARE_NUMBER_RE.test(text)) return text;
+    }
+    return undefined;
+  }
 
   let bestGroup: Element[] = [];
   let bestScore = 0;
@@ -713,11 +736,8 @@ function scrapeListings(maxItems: number): ResultItem[] {
     }
   }
 
-  const items: ResultItem[] = [];
-  const seen = new Set<string>();
-  for (const el of bestGroup) {
-    if (items.length >= maxItems) break;
-
+  /** Pulls title/image/price/details/link out of one card element - shared by the group loop and the single-item fallback below. */
+  function extractItem(el: Element): ResultItem | null {
     const titleEl =
       el.querySelector("h1,h2,h3,h4,h5,h6") ??
       el.querySelector('[class*="title" i],[id*="title" i]') ??
@@ -733,7 +753,7 @@ function scrapeListings(maxItems: number): ResultItem[] {
       title = longest;
     }
     title = title.slice(0, 140).trim();
-    if (!title) continue;
+    if (!title) return null;
 
     let image: string | undefined;
     const img = el.querySelector("img[src], img[data-src]") as HTMLImageElement | null;
@@ -752,8 +772,7 @@ function scrapeListings(maxItems: number): ResultItem[] {
     if (image && image.startsWith("//")) image = `https:${image}`;
 
     const fullText = visibleText(el);
-    const priceMatch = fullText.match(CURRENCY_RE);
-    const price = priceMatch ? priceMatch[0] : undefined;
+    const price = findPriceText(el);
 
     // Everything else short and distinct on the card - rating, review count,
     // neighborhood/location, distance, etc - shown as-is rather than guessing
@@ -780,11 +799,55 @@ function scrapeListings(maxItems: number): ResultItem[] {
       if (href && href.startsWith("http")) url = href;
     }
 
-    const dedupeKey = `${title}|${url ?? ""}`;
+    return { title, price, details: details.length > 0 ? details : undefined, image, url };
+  }
+
+  const items: ResultItem[] = [];
+  const seen = new Set<string>();
+  for (const el of bestGroup) {
+    if (items.length >= maxItems) break;
+    const item = extractItem(el);
+    if (!item) continue;
+    const dedupeKey = `${item.title}|${item.url ?? ""}`;
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
+    items.push(item);
+  }
 
-    items.push({ title, price, details: details.length > 0 ? details : undefined, image, url });
+  // The grouping above only recognizes a REPEATED card pattern (2+ similar
+  // siblings) - a search that genuinely returns just one match has no sibling
+  // to pattern-match against, so the group scorer either finds nothing, or
+  // (worse) latches onto some unrelated small repeated element on the page -
+  // a sort-order dropdown's options, for instance - and returns that instead.
+  // Neither case ever carries a price, so "no group item has a price" is the
+  // trigger for trying a single-card fallback instead of an empty list. Finds
+  // the smallest element anywhere on the page that itself looks like a
+  // self-contained product/result card (carries both an image and a price) -
+  // "smallest" picks the tight card wrapper over a page-level container that
+  // only qualifies because it happens to contain that one card - and, if
+  // found, uses it INSTEAD of whatever (likely junk) the group scorer
+  // produced, rather than alongside it.
+  if (!items.some((item) => item.price)) {
+    let singleCard: Element | null = null;
+    let singleCardSize = Infinity;
+    document.querySelectorAll("*").forEach((el) => {
+      if (
+        el.closest(
+          "nav, header, footer, dialog, [role='dialog'], [aria-modal='true'], [role='banner'], [role='navigation'], [role='contentinfo']"
+        )
+      )
+        return;
+      if (!el.querySelector("img[src], img[data-src]")) return;
+      const text = visibleText(el);
+      if (text.length < 8 || text.length > 800 || !findPriceText(el)) return;
+      const size = el.querySelectorAll("*").length;
+      if (size < singleCardSize) {
+        singleCardSize = size;
+        singleCard = el;
+      }
+    });
+    const fallbackItem = singleCard ? extractItem(singleCard) : null;
+    if (fallbackItem) return [fallbackItem];
   }
 
   return items;

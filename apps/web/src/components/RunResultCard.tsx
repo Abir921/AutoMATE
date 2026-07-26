@@ -40,7 +40,7 @@ export default function RunResultCard({ result, automation }: { result: RunResul
         </>
       )}
 
-      {result.success && automation.outputEnabled && (
+      {result.success && automation.outputEnabled && automation.outputFields.length > 0 && (
         <table>
           <tbody>
             {automation.outputFields.map((f) => (
@@ -51,6 +51,13 @@ export default function RunResultCard({ result, automation }: { result: RunResul
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* No manual output fields configured - the automatic result-list scrape is
+          the only source of output here, so an empty list means the search itself
+          came back empty, not that anything failed to extract. */}
+      {result.success && automation.outputEnabled && automation.outputFields.length === 0 && items.length === 0 && (
+        <p className="muted">No results found for this search query.</p>
       )}
 
       {result.success && !automation.outputEnabled && items.length === 0 && (

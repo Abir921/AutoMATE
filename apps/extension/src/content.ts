@@ -188,7 +188,7 @@ function init() {
 function createToolbar(handlers: { onStop: () => void }) {
   const host = document.createElement("div");
   host.id = "__automate_toolbar_host";
-  host.style.cssText = "position:fixed; top:12px; right:12px; z-index:2147483647;";
+  host.style.cssText = "position:fixed; bottom:12px; right:12px; z-index:2147483647;";
   const shadow = host.attachShadow({ mode: "open" });
   shadow.innerHTML = `
     <style>
